@@ -1,0 +1,4 @@
+telebot
+yt-dlp
+youtubesearchpython
+google-api-python-client
