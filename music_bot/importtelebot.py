@@ -1,6 +1,9 @@
 import os
 from googleapiclient.discovery import build
 import telebot
+from flask import Flask, request
+
+app = Flask(__name__)
 
 # دریافت کلیدها از محیط متغیر
 TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
@@ -39,19 +42,18 @@ def search_music(query):
         return f"خطا در جستجو: {e}"
 
 # دستور /start
-@bot.message_handler(commands=['start'])
-def start(message):
-    bot.send_message(message.chat.id, "🎵 سلام! من یک بات موزیک هستم.\n\n✅ برای جستجوی آهنگ: `/music [نام آهنگ]`\n\n")
+@app.route('/' + TELEGRAM_BOT_TOKEN, methods=['POST'])
+def webhook():
+    json_str = request.get_data().decode("UTF-8")
+    update = telebot.types.Update.de_json(json_str)
+    bot.process_new_updates([update])
+    return "!", 200
 
-# دستور جستجوی آهنگ
-@bot.message_handler(commands=['music'])
-def music(message):
-    if len(message.text.split()) > 1:
-        query = message.text.replace("/music ", "")
-        result = search_music(query)
-        bot.send_message(message.chat.id, result)
-    else:
-        bot.send_message(message.chat.id, "❗ لطفاً نام آهنگ را بعد از /music بنویس.")
+@app.route('/')
+def index():
+    return 'Music Bot is Running', 200
 
-# اجرای بات
-bot.polling()
+if __name__ == "__main__":
+    bot.remove_webhook()
+    bot.set_webhook(url="https://your-vercel-app-url/" + TELEGRAM_BOT_TOKEN)
+    app.run(debug=True)
