@@ -1,4 +1,3 @@
 telebot
-yt-dlp
 youtube-search
 google-api-python-client
