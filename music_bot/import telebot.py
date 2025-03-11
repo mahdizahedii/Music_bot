@@ -2,20 +2,37 @@ import telebot
 import time
 import yt_dlp
 import os
-from youtubesearchpython import VideosSearch
+from googleapiclient.discovery import build
+from dotenv import load_dotenv
 
-TOKEN = "7562793251:AAGCej1XcVPNC1P9QurwqBSzbVRo9Jcupyk"
+# بارگذاری متغیرهای محیطی از فایل .env
+load_dotenv()
+
+# دریافت توکن از فایل .env
+TOKEN = os.getenv("TELEGRAM_API_TOKEN")
+YOUTUBE_API_KEY = os.getenv("YOUTUBE_API_KEY")  # کلید API یوتیوب خود را اینجا وارد کنید
+
 bot = telebot.TeleBot(TOKEN)
 
 # دیکشنری برای ذخیره زمان آخرین درخواست هر کاربر (محدودیت ضد اسپم)
 user_last_request = {}
 
+# اتصال به یوتیوب API
+youtube = build('youtube', 'v3', developerKey=YOUTUBE_API_KEY)
+
 # تابع جستجوی آهنگ در یوتیوب
 def search_music(query):
-    search = VideosSearch(query + " song", limit=1)
-    result = search.result()
-    if result["result"]:
-        return result["result"][0]["link"]
+    request = youtube.search().list(
+        part="snippet",
+        q=query + " song",
+        type="video",
+        videoDefinition="high",
+        maxResults=1
+    )
+    response = request.execute()
+    if "items" in response:
+        video_url = "https://www.youtube.com/watch?v=" + response["items"][0]["id"]["videoId"]
+        return video_url
     return None
 
 # تابع دانلود آهنگ از یوتیوب
