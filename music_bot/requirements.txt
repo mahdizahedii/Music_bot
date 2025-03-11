@@ -1,4 +1,2 @@
-echo "pyTelegramBotAPI" >> requirements.txt
-echo "yt-dlp" >> requirements.txt
-echo "youtube-search-python" >> requirements.txt
-echo "google-api-python-client" >> requirements.txt
+google-api-python-client
+telebot
