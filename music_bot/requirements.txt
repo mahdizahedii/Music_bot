@@ -1,4 +1,4 @@
 telebot
 yt-dlp
-youtubesearchpython==1.6.6
+youtube-search
 google-api-python-client
